@@ -10,14 +10,41 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'Welcome to Flutter', home: RandomWords());
+    return MaterialApp(
+      title: 'Welcome to Flutter',
+      theme: new ThemeData(primaryColor: Colors.white),
+      home: RandomWords(),
+    );
   }
 }
 
 //コメント作成 + Widget Return
 class RandomWordsState extends State<RandomWords> {
   final _suggestions = <WordPair>[];
+  final Set<WordPair> _saved = new Set<WordPair>(); //Icon
   final _biggerFont = const TextStyle(fontSize: 18.0);
+
+  void _pushSaved() {
+    Navigator.of(context)
+        .push(new MaterialPageRoute<void>(builder: (BuildContext context) {
+      final Iterable<ListTile> tiles = _saved.map((WordPair pair) {
+        return new ListTile(
+          title: new Text(
+            pair.asPascalCase,
+            style: _biggerFont,
+          ),
+        );
+      });
+      final List<Widget> divided =
+          ListTile.divideTiles(context: context, tiles: tiles).toList();
+      return new Scaffold(
+        appBar: new AppBar(title: const Text('Sabed Suggenstions')),
+        body: new ListView(
+          children: divided,
+        ),
+      );
+    }));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +52,9 @@ class RandomWordsState extends State<RandomWords> {
       //Barを作成して、Title propertyをセット、Bodyを構成するWidgetをCallする
       appBar: AppBar(
         title: Text('Startup Name Generator'),
+        actions: <Widget>[
+          new IconButton(icon: const Icon(Icons.list), onPressed: _pushSaved)
+        ],
       ),
       body: _buildSuggestions(),
     );
@@ -56,11 +86,26 @@ class RandomWordsState extends State<RandomWords> {
   }
 
   Widget _buildRow(WordPair pair) {
+    final bool alreadySaved = _saved.contains(pair);
     return ListTile(
-      title: Text(
+      title: new Text(
         pair.asPascalCase,
         style: _biggerFont,
       ),
+      trailing: new Icon(
+        alreadySaved ? Icons.favorite : Icons.favorite_border,
+        color: alreadySaved ? Colors.red : null,
+      ),
+      // Iconのクリック挙動
+      onTap: () {
+        setState(() {
+          if (alreadySaved) {
+            _saved.remove(pair);
+          } else {
+            _saved.add(pair);
+          }
+        });
+      },
     );
   }
 }
