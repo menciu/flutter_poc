@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:english_words/english_words.dart'; //Added
 
 void main() => runApp(MyApp());
 
@@ -15,10 +16,21 @@ class MyApp extends StatelessWidget {
         appBar: AppBar(
           title: Text('Welcome to Flutter PoC'),
         ),
-        body: Center(
-          child: Text('Hello World'),
-        ),
+        body: Center(child: RandomWords()),
       ),
     );
   }
+}
+
+class RandomWordsState extends State<RandomWords> {
+  @override
+  Widget build(BuildContext context) {
+    final wordPair = WordPair.random(); // ★追加
+    return Text(wordPair.asPascalCase);
+  }
+}
+
+class RandomWords extends StatefulWidget {
+  @override
+  RandomWordsState createState() => new RandomWordsState();
 }
